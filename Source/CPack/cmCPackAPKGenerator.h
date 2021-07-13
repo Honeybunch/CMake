@@ -4,24 +4,22 @@
 
 #include "cmCPackGenerator.h"
 
-/** \class cmCPackNuGetGenerator
- * \brief A generator for NuGet packages
+/** \class cmCPackAPKGenerator
+ * \brief A generator for Android APK packages
  */
-class cmCPackNuGetGenerator : public cmCPackGenerator
+class cmCPackAPKGenerator : public cmCPackGenerator
 {
 public:
-  cmCPackTypeMacro(cmCPackNuGetGenerator, cmCPackGenerator);
+  cmCPackTypeMacro(cmCPackAPKGenerator, cmCPackGenerator);
 
-  // NOTE In fact, it is possible to have NuGet not only for Windows...
-  // https://docs.microsoft.com/en-us/nuget/install-nuget-client-tools
-  static bool CanGenerate() { return true; }
+  // Do we want to check to see if we can find the Android SDK here?
+  // static bool CanGenerate() { return true; }
 
-protected:
   bool SupportsComponentInstallation() const override;
   int PackageFiles() override;
 
-  const char* GetOutputExtension() override { return ".nupkg"; }
-  bool SupportsAbsoluteDestination() const override { return false; }
+  const char* GetOutputExtension() override { return ".apk"; }
+
   /**
    * The method used to prepare variables when component
    * install is used.

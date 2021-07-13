@@ -9,6 +9,7 @@
 #ifdef HAVE_FREEBSD_PKG
 #  include "cmCPackFreeBSDGenerator.h"
 #endif
+#include "cmCPackAPKGenerator.h"
 #include "cmCPackArchiveGenerator.h"
 #include "cmCPackDebGenerator.h"
 #include "cmCPackExternalGenerator.h"
@@ -135,6 +136,10 @@ cmCPackGeneratorFactory::cmCPackGeneratorFactory()
                             cmCPackFreeBSDGenerator::CreateGenerator);
   }
 #endif
+  if (cmCPackAPKGenerator::CanGenerate()) {
+    this->RegisterGenerator("APK", "Android APK Packages",
+                            cmCPackAPKGenerator::CreateGenerator);
+  }
 }
 
 std::unique_ptr<cmCPackGenerator> cmCPackGeneratorFactory::NewGenerator(
