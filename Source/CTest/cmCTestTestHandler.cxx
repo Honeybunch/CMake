@@ -2165,7 +2165,7 @@ bool cmCTestTestHandler::SetTestsProperties(
 
             // Ensure we have complete triples otherwise the data is corrupt.
             if (triples.size() % 3 == 0) {
-              cmState state;
+              cmState state(cmState::Unknown);
               rt.Backtrace = cmListFileBacktrace(state.CreateBaseSnapshot());
 
               // the first entry represents the top of the trace so we need to
@@ -2245,6 +2245,8 @@ bool cmCTestTestHandler::SetTestsProperties(
             cmExpandList(val, rt.Depends);
           } else if (key == "ENVIRONMENT"_s) {
             cmExpandList(val, rt.Environment);
+          } else if (key == "ENVIRONMENT_MODIFICATION"_s) {
+            cmExpandList(val, rt.EnvironmentModification);
           } else if (key == "LABELS"_s) {
             std::vector<std::string> Labels = cmExpandedList(val);
             rt.Labels.insert(rt.Labels.end(), Labels.begin(), Labels.end());
