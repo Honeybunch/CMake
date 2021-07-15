@@ -17,7 +17,7 @@
 
 bool cmCPackAPKGenerator::SupportsComponentInstallation() const
 {
-  return this->IsOn("CPACK_APK_COMPONENT_INSTALL");
+  return false;
 }
 
 int cmCPackAPKGenerator::PackageFiles()
@@ -28,27 +28,6 @@ int cmCPackAPKGenerator::PackageFiles()
   /* Reset package file name list it will be populated after the
    * `CPackAPK.cmake` run */
   this->packageFileNames.clear();
-
-  /* Are we in the component packaging case */
-  if (this->WantsComponentInstallation()) {
-    if (this->componentPackageMethod == ONE_PACKAGE) {
-      // CASE 1 : COMPONENT ALL-IN-ONE package
-      // Meaning that all per-component pre-installed files
-      // goes into the single package.
-      this->SetOption("CPACK_APK_ALL_IN_ONE", "TRUE");
-      this->SetupGroupComponentVariables(true);
-    } else {
-      // CASE 2 : COMPONENT CLASSICAL package(s) (i.e. not all-in-one)
-      // There will be 1 package for each component group
-      // however one may require to ignore component group and
-      // in this case you'll get 1 package for each component.
-      this->SetupGroupComponentVariables(this->componentPackageMethod ==
-                                         ONE_PACKAGE_PER_COMPONENT);
-    }
-  } else {
-    // CASE 3 : NON COMPONENT package.
-    this->SetOption("CPACK_APK_ORDINAL_MONOLITIC", "TRUE");
-  }
 
   auto retval = this->ReadListFile("Internal/CPack/CPackAPK.cmake");
   if (retval) {
@@ -61,10 +40,25 @@ int cmCPackAPKGenerator::PackageFiles()
   return retval;
 }
 
-void cmCPackAPKGenerator::SetupGroupComponentVariables(bool ignoreGroup)
-{
-}
-
 void cmCPackAPKGenerator::AddGeneratedPackageNames()
 {
+  const char* const files_list = this->GetOption("GEN_CPACK_OUTPUT_FILES");
+  if (!files_list) {
+    cmCPackLogger(
+      cmCPackLog::LOG_ERROR,
+      "Error while execution CPackAPK.cmake: No APK package has generated"
+        << std::endl);
+    return;
+  }
+  // add the generated packages to package file names list
+  std::string fileNames{ files_list };
+  const char sep = ';';
+  std::string::size_type pos1 = 0;
+  std::string::size_type pos2 = fileNames.find(sep, pos1 + 1);
+  while (pos2 != std::string::npos) {
+    this->packageFileNames.push_back(fileNames.substr(pos1, pos2 - pos1));
+    pos1 = pos2 + 1;
+    pos2 = fileNames.find(sep, pos1 + 1);
+  }
+  this->packageFileNames.push_back(fileNames.substr(pos1, pos2 - pos1));
 }

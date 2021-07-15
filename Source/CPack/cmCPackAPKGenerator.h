@@ -12,19 +12,20 @@ class cmCPackAPKGenerator : public cmCPackGenerator
 public:
   cmCPackTypeMacro(cmCPackAPKGenerator, cmCPackGenerator);
 
-  // Do we want to check to see if we can find the Android SDK here?
-  // static bool CanGenerate() { return true; }
-
+protected:
   bool SupportsComponentInstallation() const override;
+
+  /**
+   * The main package file method.
+   * If component install was required this
+   * method will call either PackageComponents or
+   * PackageComponentsAllInOne.
+   */
   int PackageFiles() override;
 
   const char* GetOutputExtension() override { return ".apk"; }
 
-  /**
-   * The method used to prepare variables when component
-   * install is used.
-   */
-  void SetupGroupComponentVariables(bool ignoreGroup);
+private:
   /**
    * Populate \c packageFileNames vector of built packages.
    */
